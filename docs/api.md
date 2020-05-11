@@ -3,7 +3,7 @@
 
 The `withTracker` component is used the same way as [`meteor/react-meteor-data`](https://guide.meteor.com/react.html#using-withTracker)
 
-````
+```javascript
 export default withTracker(() => {
     let handle = Meteor.subscribe("mySubscription");
     let loading = !handle.ready();
@@ -13,15 +13,18 @@ export default withTracker(() => {
         myStuff
     };
 })(MyComponent);
-````
+```
 
 ## Meteor
-`import { Meteor } from 'meteor-react-native`
+`import Meteor from 'meteor-react-native`
 
 #### `Meteor.connect(url, options)`
 Connect to the Meteor Server
 
 **options**:
+* BREAKING: AsyncStorage **object** [No default]. You must import and set to your preferred AsyncStorage.  Tested libraries (must have one installed as dependency):
+    - `{ AsyncStorage } from 'react-native'` (preferred if using Expo), OR
+    - `{ AsyncStorage } from '@react-native-community/async-storage'` (defaulted fallback)
 * autoConnect **boolean** [true] whether to establish the connection to the server upon instantiation. When false, one can manually establish the connection with the Meteor.ddp.connect method.
 * autoReconnect **boolean** [true] whether to try to reconnect to the server when the socket connection closes, unless the closing was initiated by a call to the disconnect method.
 * reconnectInterval **number** [10000] the interval in ms between reconnection attempts.
