@@ -40,6 +40,11 @@ export class Collection {
   constructor(name, options = {}) {
     if (!Data.db[name]) Data.db.addCollection(name);
 
+    // Allows for local - client-side only collections.
+    //  These collections are not mirrored on server,
+    //  or persisted in AsyncStorage (maybe in future?)
+    this._clientSideOnly = !!options.clientSideOnly || false;
+
     this._collection = Data.db[name];
     this._name = name;
     this._transform = wrapTransform(options.transform);
@@ -97,16 +102,19 @@ export class Collection {
       });
 
     this._collection.upsert(item);
-    Data.waitDdpConnected(() => {
-      call(`/${this._name}/insert`, item, err => {
-        if (err) {
-          this._collection.del(id);
-          return callback(err);
-        }
 
-        callback(null, id);
+    if (!this._clientSideOnly) {
+      Data.waitDdpConnected(() => {
+        call(`/${this._name}/insert`, item, err => {
+          if (err) {
+            this._collection.del(id);
+            return callback(err);
+          }
+
+          callback(null, id);
+        });
       });
-    });
+    }
 
     return id;
   }
@@ -126,15 +134,17 @@ export class Collection {
     // change mini mongo for optimize UI changes
     this._collection.upsert({ _id: id, ...modifier.$set });
 
-    Data.waitDdpConnected(() => {
-      call(`/${this._name}/update`, { _id: id }, modifier, err => {
-        if (err) {
-          return callback(err);
-        }
+    if (!this._clientSideOnly) {
+      Data.waitDdpConnected(() => {
+        call(`/${this._name}/update`, { _id: id }, modifier, err => {
+          if (err) {
+            return callback(err);
+          }
 
-        callback(null, id);
+          callback(null, id);
+        });
       });
-    });
+    }
   }
 
   remove(id, callback = () => {}) {
@@ -143,15 +153,17 @@ export class Collection {
     if (element) {
       this._collection.del(element._id);
 
-      Data.waitDdpConnected(() => {
-        call(`/${this._name}/remove`, { _id: id }, (err, res) => {
-          if (err) {
-            this._collection.upsert(element);
-            return callback(err);
-          }
-          callback(null, res);
+      if (!this._clientSideOnly) {
+        Data.waitDdpConnected(() => {
+          call(`/${this._name}/remove`, { _id: id }, (err, res) => {
+            if (err) {
+              this._collection.upsert(element);
+              return callback(err);
+            }
+            callback(null, res);
+          });
         });
-      });
+      }
     } else {
       callback(`No document with _id : ${id}`);
     }
