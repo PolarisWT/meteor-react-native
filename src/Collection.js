@@ -87,7 +87,7 @@ export class Collection {
     if ('_id' in item) {
       if (!item._id || typeof item._id != 'string') {
         return callback(
-          'Meteor requires document _id fields to be non-empty strings'
+          'Meteor requires document _id fields to be non-empty strings',
         );
       }
       id = item._id;
@@ -169,6 +169,19 @@ export class Collection {
     }
   }
 
+  removeAll(selector, options, callback = () => {}) {
+    if (typeof options == 'function') {
+      callback = options;
+      options = {};
+    }
+
+    if (!this._clientSideOnly) {
+      callback('Unable to remove all.  Must be a clientSideOnly collection');
+    }
+
+    this._collection.remove(selector, options);
+  }
+
   helpers(helpers) {
     var self = this;
     let _transform;
@@ -229,7 +242,7 @@ function wrapTransform(transform) {
 
     if (_.has(transformed, '_id')) {
       if (!EJSON.equals(transformed._id, id)) {
-        throw new Error("transformed document can't have different _id");
+        throw new Error('transformed document can\'t have different _id');
       }
     } else {
       transformed._id = id;

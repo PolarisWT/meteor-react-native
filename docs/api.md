@@ -4,7 +4,7 @@
 The `withTracker` component is used the same way as [`meteor/react-meteor-data`](https://guide.meteor.com/react.html#using-withTracker)
 
 ```javascript
-export default withTracker(() => {
+export default withTracker((props) => {
     let handle = Meteor.subscribe("mySubscription");
     let loading = !handle.ready();
     let myStuff = Stuff.find({}).fetch();
@@ -61,24 +61,35 @@ Returns true if attempting to login
 
 #### `Meteor.logoutOtherClients`
 
-
-
 ## ReactiveDict
 `import { ReactiveDict } from 'meteor-react-native'`
 
 https://atmospherejs.com/meteor/reactive-dict
-
+https://docs.meteor.com/api/reactive-dict.html
 
 
 ## Mongo
 `import { Mongo } from 'meteor-react-native';`
 
 #### `Mongo.Collection(collectionName, options)`
+```javascript
+import { Mongo } from 'meteor-react-native';
+
+const MyCollection = new Mongo.Collection('myCollection', { clientSideOnly: false })
+```
 
 **options**:
   * [.insert(doc, callback)](http://docs.meteor.com/#/full/insert)
+    - `const newId = MyCollection.insert({name: 'John', role: 'user'});`
   * [.update(id, modifier, [options], [callback])](http://docs.meteor.com/#/full/update)
+    - `MyCollection.update(newId, {$set: {role: 'admin'}});`
   * [.remove(id, callback(err, countRemoved))](http://docs.meteor.com/#/full/remove)
+    - `MyCollection.remove(newId, (err, count) => { console.log('Removed ${count} documents')};`
+    - This should always `countRemoved` either 0 if error/not found, or 1 if success
+  * [.removeAll(id, callback(err, countRemoved))](Client Side Collection ONLY)
+    - `MyCollection.removeAll((err, count) => { console.log('Removed ${count} documents')};`
+    - Only available to **`{clientSideOnly: true}`** collections
+    
 
 
 
