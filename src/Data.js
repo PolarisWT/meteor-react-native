@@ -5,7 +5,7 @@ import { InteractionManager } from 'react-native';
 process.nextTick = setImmediate;
 
 const db = new minimongo();
-db.debug = false;
+db.debug = true;
 db.batchedUpdates = ReactNative.unstable_batchedUpdates;
 
 function runAfterOtherComputations(fn) {
