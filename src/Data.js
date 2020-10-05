@@ -3,7 +3,7 @@ import Trackr from 'trackr';
 import { InteractionManager } from 'react-native';
 process.nextTick = setImmediate;
 
-const ReactNative = require(__dirname + '/react-native/Libraries/Rederer/shims/ReactNative.js');
+const ReactNative = require('react-native/Libraries/Renderer/shims/ReactNative.js');
 
 const db = new minimongo();
 db.debug = false;
