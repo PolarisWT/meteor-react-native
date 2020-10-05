@@ -1,7 +1,9 @@
 import minimongo from 'minimongo-cache';
 import Trackr from 'trackr';
-import { InteractionManager, ReactNative } from 'react-native';
+import { InteractionManager } from 'react-native';
 process.nextTick = setImmediate;
+
+const ReactNative = require('react-native/Libraries/Rederer/shims/ReactNative.js');
 
 const db = new minimongo();
 db.debug = false;
